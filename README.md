@@ -26,20 +26,22 @@ labeling_web/
 ├── config.py           # 전역 상수 (임계값, 경로 등)
 ├── requirements.txt
 ├── CLAUDE.md           # AI 협업용 프로젝트 컨텍스트
+├── .streamlit/
+│   └── config.toml     # Streamlit 서버 설정 (업로드 용량, headless 등)
 ├── data/
 │   ├── raw/videos/     # 업로드된 원본 영상 (gitignore)
-│   └── low_confidence_data.json  # confidence < 0.8 결과
+│   └── low_confidence_data.json  # confidence 임계값 미만 결과
 ├── db/
 │   ├── schema.sql      # 테이블 생성 SQL
 │   └── database.py     # DB 연결 및 CRUD
 ├── pipeline/
-│   ├── ingest.py       # 영상 수집 및 큐 등록
-│   ├── inference.py    # YOLO 추론
-│   ├── transform.py    # 결과 정규화 및 검증
+│   ├── ingest.py       # 프레임 추출 (제너레이터, 샘플링)
+│   ├── inference.py    # YOLO OBB 추론
+│   ├── transform.py    # 결과 정규화 및 검증 (OBB 지원)
 │   ├── load.py         # SQLite 적재
 │   └── retry.py        # 자동 재시도 로직
 ├── views/
-│   ├── upload.py       # 업로드 & 탐지 페이지
+│   ├── upload.py       # 업로드 & 실시간 탐지 페이지
 │   ├── history.py      # 히스토리 조회 페이지
 │   ├── dashboard.py    # 통계 대시보드 페이지
 │   └── reprocess.py    # 수동 재처리 페이지
@@ -47,7 +49,7 @@ labeling_web/
 │   ├── slack.py        # Slack Webhook 알림
 │   └── export.py       # CSV 내보내기
 └── models/
-    └── loader.py       # best.pt 로드 및 캐싱
+    └── loader.py       # best.pt 로드 및 캐싱 (lazy import)
 ```
 
 ---
@@ -72,7 +74,21 @@ pip install -r requirements.txt
 
 # 5. 앱 실행
 streamlit run app.py
+
+# Mac Apple Silicon(M1/M2/M3) 사용 시
+# PyTorch OMP 초기화 hang 방지를 위해 아래 명령어 사용
+# (models/loader.py에서 자동 설정되므로 일반적으로 불필요)
+streamlit run app.py
 ```
+
+> **첫 실행 시 주의**  
+> 첫 탐지 시 PyTorch 및 YOLO 모델 로드로 수십 초~수 분이 걸릴 수 있습니다. 이후 실행부터는 캐시되어 빠릅니다.
+>
+> **Mac Apple Silicon(M1/M2/M3) 추가 설정**  
+> PyTorch + MPS 초기화 hang 방지를 위해 아래 설정을 권장합니다.
+> ```bash
+> mkdir -p ~/.config/Ultralytics && echo "sync: false" >> ~/.config/Ultralytics/settings.yaml
+> ```
 
 ---
 

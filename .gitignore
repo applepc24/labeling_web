@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environment
+venv/
+.venv/
+env/
+.env/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyright/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database
+*.sqlite3
+*.db
+*.sqlite
+
+# 모델 가중치
+*.pt
+*.pth
+*.onnx
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+# 업로드 영상 (용량 큰 바이너리)
+data/raw/videos/*
+!data/raw/videos/.gitkeep
+
+# low_confidence 런타임 결과
+data/low_confidence_data.json

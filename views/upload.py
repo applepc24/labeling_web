@@ -1,6 +1,6 @@
 import streamlit as st
 from models.loader import load_model
-from pipeline.ingest import extract_frames
+from pipeline.ingest import iter_frames
 from pipeline.inference  import run_inference
 from pipeline.transform import transform, save_low_confidence
 import tempfile
@@ -21,15 +21,31 @@ def render():
             tmp_path = tmp.name
         
         try:
-            with st.spinner("프레임 추출 중 ..."):
-                frames = extract_frames(tmp_path)
+            model = load_model()
+            progress = st.progress(0, text="추론 중 ...")
+            col_video, col_log = st.columns([2, 1])
+            frame_placeholder = col_video.empty()
+            log_placeholder = col_log.empty()
+            log_entries = []
+            high_all = []
+            low_all = []
+
+            for frame_idx, result, total in run_inference(iter_frames(tmp_path), model):
+                pct = min(int((frame_idx+1) / total * 100), 100)
+                progress.progress(pct, text=f"추론 중... {pct}%")
+                h, l = transform([result])
+                high_all.extend(h)
+                low_all.extend(l)
+
+                frame_placeholder.image(result.plot(), channels="BGR")
+
+                for det in h + l:
+                    log_entries.append(f"[{frame_idx}] {det['class_name']} {det['confidence']:.2f}")
+                log_placeholder.text("\n".join(log_entries[-30:]))
             
-            with st.spinner(f"추론 중 ... (총 {len(frames)}프레임)"):
-                model = load_model()
-                results = run_inference(frames, model)
-            
-            high, low = transform(results)
-            save_low_confidence(low)
-            st.success(f"완료! {len(high)}개 탐지 완료 (low confidence: {len(low)}개)")
+            progress.empty()
+            save_low_confidence(low_all)
+            st.success(f"완료! {len(high_all)}개 탐지 완료 (low confidence: {len(low_all)}개)")
+
         finally:
             os.remove(tmp_path)

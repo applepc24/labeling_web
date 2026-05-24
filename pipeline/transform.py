@@ -6,11 +6,11 @@ def transform(results: list) -> tuple[list, list]:
     low = []
 
     for frame_idx, result in enumerate(results):
-        for box in result.boxes:
+        for box in (result.obb or []):
             confidence = float(box.conf[0])
             class_id = int(box.cls[0])
             class_name = result.names[class_id]
-            x, y, w, h = box.xywh[0].tolist()
+            x, y, w, h, _ = box.xywhr[0].tolist()
 
             row = {
                 "frame_idx": frame_idx,

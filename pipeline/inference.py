@@ -1,9 +1,7 @@
 import config
 
-def run_inference(frames: list, model) -> list:
-    results = []
-
-    for frame in frames:
+def run_inference(frame_iter, model):
+    for frame_idx, frame, total in frame_iter:
         result = model.predict(
             source=frame,
             conf=config.CONFIDENCE_THRESHOLD,
@@ -11,5 +9,4 @@ def run_inference(frames: list, model) -> list:
             imgsz=config.IMAGE_SIZE,
             verbose=False,
         )
-        results.append(result[0])
-    return results
+        yield frame_idx, result[0], total

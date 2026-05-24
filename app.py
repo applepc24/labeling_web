@@ -1,4 +1,8 @@
 import streamlit as st
+from views.upload import render as render_upload
+from views.history import render as render_history
+from views.dashboard import render as render_dashboard
+from views.reprocess import render as render_reprocess
 
 st.set_page_config(
     page_title="YOLOv8 Object Detection",
@@ -13,17 +17,13 @@ tab_upload, tab_history, tab_dashboard, tab_reprocess = st.tabs(
 )
 
 with tab_upload:
-    from views.upload import render
-    render()
+    render_upload()
 
 with tab_history:
-    from views.history import render
-    render()
+    render_history()
 
 with tab_dashboard:
-    from views.dashboard import render
-    render()
+    render_dashboard()
 
 with tab_reprocess:
-    from views.reprocess import render
-    render()
+    render_reprocess()

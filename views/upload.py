@@ -3,6 +3,8 @@ from models.loader import load_model
 from pipeline.ingest import iter_frames
 from pipeline.inference  import run_inference
 from pipeline.transform import transform, save_low_confidence
+from utils.slack import notify_detection_complete
+from utils.export import render_download_button
 import tempfile
 import os
 
@@ -46,6 +48,8 @@ def render():
             progress.empty()
             save_low_confidence(low_all)
             st.success(f"완료! {len(high_all)}개 탐지 완료 (low confidence: {len(low_all)}개)")
+            notify_detection_complete(uploaded_file.name, len(high_all), len(low_all))
+            render_download_button(high_all, f"{uploaded_file.name}_detections.csv")
 
         finally:
             os.remove(tmp_path)

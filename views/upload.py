@@ -73,12 +73,19 @@ def render():
             log_placeholder.empty()
 
             if annotated_frames:
+                import subprocess
                 h_px, w_px = annotated_frames[0].shape[:2]
+                raw_path = tmp_path + "_raw.mp4"
                 out_path = tmp_path + "_annotated.mp4"
-                out = cv2.VideoWriter(out_path, cv2.VideoWriter_fourcc(*'mp4v'), 10, (w_px, h_px))
+                out = cv2.VideoWriter(raw_path, cv2.VideoWriter_fourcc(*'mp4v'), 10, (w_px, h_px))
                 for f in annotated_frames:
                     out.write(f)
                 out.release()
+                subprocess.run(
+                    ['ffmpeg', '-y', '-i', raw_path, '-vcodec', 'libx264', '-f', 'mp4', out_path],
+                    capture_output=True
+                )
+                os.remove(raw_path)
                 with open(out_path, 'rb') as vf:
                     st.video(vf.read())
                 os.remove(out_path)

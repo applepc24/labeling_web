@@ -75,6 +75,7 @@ def render():
                     frame_placeholder.image(result.plot(), channels="BGR")
                     log_placeholder.text("\n".join(log_entries[-30:]))
                     last_ui_update = now
+                    time.sleep(0.1)
 
             progress.empty()
             save_low_confidence(low_all)

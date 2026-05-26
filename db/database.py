@@ -1,10 +1,8 @@
 import sqlite3
-import sys
 from collections import defaultdict
 from contextlib import contextmanager
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
 import config
 
 _SCHEMA_PATH = Path(__file__).parent / "schema.sql"

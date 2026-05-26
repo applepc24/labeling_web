@@ -36,9 +36,8 @@ def render():
             tmp.write(uploaded_file.read())
             tmp_path = tmp.name
 
-        log_id = db.log_pipeline(uploaded_file.name, status="running")
-
         try:
+            log_id = db.log_pipeline(uploaded_file.name, status="running")
             model = load_model()
             fps, duration = _get_video_meta(tmp_path)
             file_size = os.path.getsize(tmp_path)

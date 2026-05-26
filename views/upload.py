@@ -9,8 +9,8 @@ from pipeline.ingest import iter_frames
 from pipeline.inference import run_inference
 from pipeline.load import load_to_db
 from pipeline.transform import transform, save_low_confidence
-from utils.export import render_download_button
-from utils.notify import notify_detection_complete, notify_pipeline_error
+from app_utils.export import render_download_button
+from app_utils.notify import notify_detection_complete, notify_pipeline_error
 
 
 def _get_video_meta(path: str) -> tuple[float, float]:

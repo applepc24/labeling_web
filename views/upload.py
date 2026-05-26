@@ -44,40 +44,45 @@ def render():
 
         log_id = None
         try:
+            import cv2
             log_id = db.log_pipeline(file_name, status="running")
             model = load_model()
             fps, duration = _get_video_meta(tmp_path)
             file_size = os.path.getsize(tmp_path)
 
             progress = st.progress(0, text="추론 중 ...")
-            col_video, col_log = st.columns([2, 1])
-            frame_placeholder = col_video.empty()
-            log_placeholder = col_log.empty()
+            log_placeholder = st.empty()
             log_entries = []
             high_all = []
             low_all = []
+            annotated_frames = []
 
-            import time
-            last_ui_update = 0.0
             for frame_idx, result, total in run_inference(iter_frames(tmp_path), model):
                 pct = min(int((frame_idx + 1) / total * 100), 100)
+                progress.progress(pct, text=f"추론 중... {pct}%")
                 h, l = transform([result])
                 high_all.extend(h)
                 low_all.extend(l)
+                annotated_frames.append(result.plot())
 
                 for det in h + l:
                     log_entries.append(f"[{frame_idx}] {det['class_name']} {det['confidence']:.2f}")
-
-                now = time.time()
-                if now - last_ui_update >= 0.3:
-                    progress.progress(pct, text=f"추론 중... {pct}%")
-                    import cv2
-                    display_frame = cv2.resize(result.plot(), (640, 360))
-                    frame_placeholder.image(display_frame, channels="BGR")
-                    log_placeholder.text("\n".join(log_entries[-30:]))
-                    last_ui_update = now
+                log_placeholder.text("\n".join(log_entries[-30:]))
 
             progress.empty()
+            log_placeholder.empty()
+
+            if annotated_frames:
+                h_px, w_px = annotated_frames[0].shape[:2]
+                out_path = tmp_path + "_annotated.mp4"
+                out = cv2.VideoWriter(out_path, cv2.VideoWriter_fourcc(*'mp4v'), 10, (w_px, h_px))
+                for f in annotated_frames:
+                    out.write(f)
+                out.release()
+                with open(out_path, 'rb') as vf:
+                    st.video(vf.read())
+                os.remove(out_path)
+
             save_low_confidence(low_all)
 
             load_to_db(

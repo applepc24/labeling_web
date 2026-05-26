@@ -1,7 +1,5 @@
 import json
 
-import pandas as pd
-import plotly.express as px
 import streamlit as st
 
 import config
@@ -9,7 +7,8 @@ from db.database import get_agg_stats, get_all_videos
 
 
 def _class_chart(stats: list[dict]):
-    """T-12: 클래스 분포 — 막대 + 파이"""
+    import pandas as pd
+    import plotly.express as px
     df = pd.DataFrame(stats)
     class_df = df.groupby("class_name", as_index=False)["count"].sum()
     class_df = class_df.sort_values("count", ascending=False)
@@ -24,14 +23,15 @@ def _class_chart(stats: list[dict]):
             color="class_name",
         )
         fig.update_layout(showlegend=False)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     with col2:
         fig = px.pie(class_df, names="class_name", values="count", title="클래스 분포")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
 
 def _video_detection_chart(videos: list[dict]):
-    """T-13-1: 영상별 탐지 수"""
+    import pandas as pd
+    import plotly.express as px
     df = pd.DataFrame(videos)[["video_name", "detection_count"]]
     df = df.sort_values("detection_count", ascending=False)
     fig = px.bar(
@@ -42,11 +42,12 @@ def _video_detection_chart(videos: list[dict]):
         color="video_name",
     )
     fig.update_layout(showlegend=False)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 
 def _confidence_chart(stats: list[dict]):
-    """T-13-2: 클래스별 평균 confidence"""
+    import pandas as pd
+    import plotly.express as px
     df = pd.DataFrame(stats)
     conf_df = df.groupby("class_name", as_index=False)["avg_confidence"].mean()
     conf_df = conf_df.sort_values("avg_confidence", ascending=False)
@@ -59,7 +60,7 @@ def _confidence_chart(stats: list[dict]):
         color="avg_confidence",
         color_continuous_scale="RdYlGn",
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 
 def _low_conf_ratio_chart(stats: list[dict]):
@@ -79,13 +80,14 @@ def _low_conf_ratio_chart(stats: list[dict]):
         st.info("데이터가 없습니다.")
         return
 
+    import plotly.express as px
     fig = px.pie(
         names=["고신뢰도", "저신뢰도"],
         values=[high_count, low_count],
         title=f"고/저 신뢰도 비율 (기준 {config.CONFIDENCE_THRESHOLD})",
         color_discrete_sequence=["#2ecc71", "#e74c3c"],
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 
 def render():

@@ -46,8 +46,7 @@ def render():
         log_id = None
         try:
             log_id = db.log_pipeline(file_name, status="running")
-            with st.spinner("모델 로딩 중..."):
-                model = load_model()
+            model = load_model()
             fps, duration = _get_video_meta(tmp_path)
             file_size = os.path.getsize(tmp_path)
 

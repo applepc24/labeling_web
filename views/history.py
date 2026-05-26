@@ -23,7 +23,7 @@ def render():
     })
 
     st.subheader("업로드된 영상 목록")
-    st.dataframe(df_videos, width='stretch')
+    st.dataframe(df_videos, use_container_width=True)
 
     st.subheader("영상별 탐지 상세")
     video_options = {v["video_name"]: v["id"] for v in videos}
@@ -33,6 +33,6 @@ def render():
         detections = db.get_detections_by_video(video_options[selected])
         if detections:
             df = pd.DataFrame(detections).drop(columns=["id", "video_id"], errors="ignore")
-            st.dataframe(df, width='stretch')
+            st.dataframe(df, use_container_width=True)
         else:
             st.info("이 영상에 대한 탐지 결과가 없습니다.")

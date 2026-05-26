@@ -10,6 +10,8 @@ from pipeline.ingest import iter_frames
 from pipeline.inference import run_inference
 from pipeline.load import load_to_db
 from pipeline.transform import transform, save_low_confidence
+from utils.export import render_download_button
+from utils.notify import notify_detection_complete, notify_pipeline_error
 
 
 def _get_video_meta(path: str) -> tuple[float, float]:
@@ -73,11 +75,14 @@ def render():
                 detections=high_all,
             )
             db.update_pipeline_log(log_id, status="success")
+            notify_detection_complete(uploaded_file.name, len(high_all), len(low_all))
+            render_download_button(high_all, f"{uploaded_file.name}_detections.csv")
 
             st.success(f"완료! {len(high_all)}개 탐지 (low confidence: {len(low_all)}개) — DB 저장 완료")
 
         except Exception as e:
             db.update_pipeline_log(log_id, status="failed", error_msg=str(e))
+            notify_pipeline_error(uploaded_file.name, str(e))
             st.error(f"파이프라인 오류: {e}")
 
         finally:

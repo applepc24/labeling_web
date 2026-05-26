@@ -63,6 +63,7 @@ logs/
 # 업로드 영상 (용량 큰 바이너리)
 data/raw/videos/*
 !data/raw/videos/.gitkeep
+!data/raw/videos/generate_test_videos.py
 
 # low_confidence 런타임 결과
 data/low_confidence_data.json

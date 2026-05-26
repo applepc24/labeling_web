@@ -58,18 +58,23 @@ def render():
             high_all = []
             low_all = []
 
+            import time
+            last_ui_update = 0.0
             for frame_idx, result, total in run_inference(iter_frames(tmp_path), model):
                 pct = min(int((frame_idx + 1) / total * 100), 100)
-                progress.progress(pct, text=f"추론 중... {pct}%")
                 h, l = transform([result])
                 high_all.extend(h)
                 low_all.extend(l)
 
-                frame_placeholder.image(result.plot(), channels="BGR")
-
                 for det in h + l:
                     log_entries.append(f"[{frame_idx}] {det['class_name']} {det['confidence']:.2f}")
-                log_placeholder.text("\n".join(log_entries[-30:]))
+
+                now = time.time()
+                if now - last_ui_update >= 0.1:
+                    progress.progress(pct, text=f"추론 중... {pct}%")
+                    frame_placeholder.image(result.plot(), channels="BGR")
+                    log_placeholder.text("\n".join(log_entries[-30:]))
+                    last_ui_update = now
 
             progress.empty()
             save_low_confidence(low_all)

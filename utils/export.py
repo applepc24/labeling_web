@@ -1,8 +1,8 @@
-import pandas as pd
 import streamlit as st
 
 
 def detections_to_csv(detections: list[dict]) -> bytes:
+    import pandas as pd
     df = pd.DataFrame(detections)
     return df.to_csv(index=False).encode("utf-8-sig")
 

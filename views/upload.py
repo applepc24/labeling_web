@@ -1,7 +1,6 @@
 import os
 import tempfile
 
-import cv2
 import streamlit as st
 
 import db.database as db
@@ -15,6 +14,7 @@ from utils.notify import notify_detection_complete, notify_pipeline_error
 
 
 def _get_video_meta(path: str) -> tuple[float, float]:
+    import cv2
     cap = cv2.VideoCapture(path)
     fps = cap.get(cv2.CAP_PROP_FPS) or 0.0
     frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0

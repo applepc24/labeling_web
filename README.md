@@ -1,3 +1,15 @@
+---
+title: Labeling Web
+emoji: 🎯
+colorFrom: blue
+colorTo: purple
+sdk: streamlit
+sdk_version: "1.45.1"
+python_version: "3.12"
+app_file: app.py
+pinned: false
+---
+
 # YOLOv8 영상 객체 탐지 웹 서비스
 
 Streamlit 기반 YOLOv8 영상 객체 탐지 서비스입니다.  

@@ -38,7 +38,6 @@ def render():
     file_name = st.session_state['file_name']
 
     if st.button("탐지 시작"):
-        st.info("파일 준비 중...")
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp:
             tmp.write(st.session_state['file_bytes'])
             tmp_path = tmp.name
@@ -72,7 +71,9 @@ def render():
                 now = time.time()
                 if now - last_ui_update >= 0.3:
                     progress.progress(pct, text=f"추론 중... {pct}%")
-                    frame_placeholder.image(result.plot(), channels="BGR")
+                    import cv2
+                    display_frame = cv2.resize(result.plot(), (640, 360))
+                    frame_placeholder.image(display_frame, channels="BGR")
                     log_placeholder.text("\n".join(log_entries[-30:]))
                     last_ui_update = now
 

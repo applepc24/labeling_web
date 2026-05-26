@@ -1,8 +1,11 @@
 import streamlit as st
+import db.database as db
 from views.upload import render as render_upload
 from views.history import render as render_history
 from views.dashboard import render as render_dashboard
 from views.reprocess import render as render_reprocess
+
+db.init_db()
 
 st.set_page_config(
     page_title="YOLOv8 Object Detection",

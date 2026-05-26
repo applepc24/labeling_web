@@ -38,10 +38,12 @@ def render():
     file_name = st.session_state['file_name']
 
     if st.button("탐지 시작"):
+        st.info("파일 준비 중...")
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp:
             tmp.write(st.session_state['file_bytes'])
             tmp_path = tmp.name
 
+        log_id = None
         try:
             log_id = db.log_pipeline(file_name, status="running")
             with st.spinner("모델 로딩 중..."):
@@ -87,9 +89,11 @@ def render():
             st.success(f"완료! {len(high_all)}개 탐지 (low confidence: {len(low_all)}개) — DB 저장 완료")
 
         except Exception as e:
-            db.update_pipeline_log(log_id, status="failed", error_msg=str(e))
+            if log_id is not None:
+                db.update_pipeline_log(log_id, status="failed", error_msg=str(e))
             notify_pipeline_error(file_name, str(e))
             st.error(f"파이프라인 오류: {e}")
 
         finally:
-            os.remove(tmp_path)
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)

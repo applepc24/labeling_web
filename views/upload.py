@@ -30,7 +30,7 @@ def render():
 
     if uploaded_file is not None:
         st.session_state['file_bytes'] = uploaded_file.getvalue()
-        st.session_state['file_name'] = file_name
+        st.session_state['file_name'] = uploaded_file.name
 
     if 'file_bytes' not in st.session_state:
         return

@@ -20,4 +20,4 @@ MAX_RETRY = 3
 SLACK_WEBHOOK_URL = ""  # st.secrets["SLACK_WEBHOOK_URL"] 로 교체 예정
 
 # --- gdown ---
-MODEL_GDRIVE_ID = ""  # best.pt Google Drive 파일 ID
+MODEL_GDRIVE_ID = "1yUIHWoLgPOhxaFPVhUh9Krjboiuvqgmx"

@@ -13,20 +13,26 @@ st.set_page_config(
     layout="wide",
 )
 
-st.title("YOLOv8 영상 객체 탐지")
+if "page" not in st.session_state:
+    st.session_state.page = "upload"
 
-tab_upload, tab_history, tab_dashboard, tab_reprocess = st.tabs(
-    ["📤 업로드 & 탐지", "📋 탐지 히스토리", "📊 통계 대시보드", "🔄 실패 재처리"]
-)
+with st.sidebar:
+    st.title("🎯 YOLOv8 탐지")
+    st.divider()
+    if st.button("📤 업로드 & 탐지", use_container_width=True):
+        st.session_state.page = "upload"
+    if st.button("📋 탐지 히스토리", use_container_width=True):
+        st.session_state.page = "history"
+    if st.button("📊 통계 대시보드", use_container_width=True):
+        st.session_state.page = "dashboard"
+    if st.button("🔄 실패 재처리", use_container_width=True):
+        st.session_state.page = "reprocess"
 
-with tab_upload:
+if st.session_state.page == "upload":
     render_upload()
-
-with tab_history:
+elif st.session_state.page == "history":
     render_history()
-
-with tab_dashboard:
+elif st.session_state.page == "dashboard":
     render_dashboard()
-
-with tab_reprocess:
+elif st.session_state.page == "reprocess":
     render_reprocess()

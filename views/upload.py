@@ -70,12 +70,11 @@ def render():
                     log_entries.append(f"[{frame_idx}] {det['class_name']} {det['confidence']:.2f}")
 
                 now = time.time()
-                if now - last_ui_update >= 0.1:
+                if now - last_ui_update >= 0.3:
                     progress.progress(pct, text=f"추론 중... {pct}%")
                     frame_placeholder.image(result.plot(), channels="BGR")
                     log_placeholder.text("\n".join(log_entries[-30:]))
                     last_ui_update = now
-                    time.sleep(0.1)
 
             progress.empty()
             save_low_confidence(low_all)

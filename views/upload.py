@@ -10,6 +10,7 @@ from pipeline.ingest import iter_frames
 from pipeline.inference import run_inference
 from pipeline.load import load_to_db
 from pipeline.transform import transform, save_low_confidence
+from utils.export import render_download_button
 
 
 def _get_video_meta(path: str) -> tuple[float, float]:
@@ -73,6 +74,7 @@ def render():
                 detections=high_all,
             )
             db.update_pipeline_log(log_id, status="success")
+            render_download_button(high_all, f"{uploaded_file.name}_detections.csv")
 
             st.success(f"완료! {len(high_all)}개 탐지 (low confidence: {len(low_all)}개) — DB 저장 완료")
 

@@ -28,16 +28,22 @@ def render():
 
     uploaded_file = st.file_uploader("영상 파일을 업로드하세요", type=["mp4", "avi", "mov"])
 
-    if uploaded_file is None:
+    if uploaded_file is not None:
+        st.session_state['file_bytes'] = uploaded_file.getvalue()
+        st.session_state['file_name'] = file_name
+
+    if 'file_bytes' not in st.session_state:
         return
+
+    file_name = st.session_state['file_name']
 
     if st.button("탐지 시작"):
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp:
-            tmp.write(uploaded_file.read())
+            tmp.write(st.session_state['file_bytes'])
             tmp_path = tmp.name
 
         try:
-            log_id = db.log_pipeline(uploaded_file.name, status="running")
+            log_id = db.log_pipeline(file_name, status="running")
             with st.spinner("모델 로딩 중..."):
                 model = load_model()
             fps, duration = _get_video_meta(tmp_path)
@@ -68,21 +74,21 @@ def render():
             save_low_confidence(low_all)
 
             load_to_db(
-                video_name=uploaded_file.name,
+                video_name=file_name,
                 file_size=file_size,
                 fps=fps,
                 duration=duration,
                 detections=high_all,
             )
             db.update_pipeline_log(log_id, status="success")
-            notify_detection_complete(uploaded_file.name, len(high_all), len(low_all))
-            render_download_button(high_all, f"{uploaded_file.name}_detections.csv")
+            notify_detection_complete(file_name, len(high_all), len(low_all))
+            render_download_button(high_all, f"{file_name}_detections.csv")
 
             st.success(f"완료! {len(high_all)}개 탐지 (low confidence: {len(low_all)}개) — DB 저장 완료")
 
         except Exception as e:
             db.update_pipeline_log(log_id, status="failed", error_msg=str(e))
-            notify_pipeline_error(uploaded_file.name, str(e))
+            notify_pipeline_error(file_name, str(e))
             st.error(f"파이프라인 오류: {e}")
 
         finally:
